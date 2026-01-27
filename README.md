@@ -133,6 +133,27 @@ This dramatically lowers the barrier to entry for teams and classrooms.
 
 ---
 
+## VRSTE vs Professional Robotics Software
+
+VRSTE is designed to feel like a **full robotics lab in your browser**, combining the accessibility of educational tools with the power and flexibility of professional robotics software.  
+
+| Feature / Capability | VRSTE | Professional Robotics Software (e.g., Webots, Gazebo, ROS + RViz) |
+|---------------------|-------|---------------------------------------------|
+| Programming Language | Real C++ in browser | C++, Python, or proprietary scripting (requires local setup) |
+| Editor | Monaco-powered, live transpilation | External IDE (VS Code, Eclipse, etc.) |
+| Execution | Live, asynchronous runtime in-browser | Requires compilation, runtime often local or server-based |
+| Physics Engines | Modular & swappable (Simulation.js, MuJoCo, Bullet, Drake) | Usually fixed per simulator; advanced engines require manual integration |
+| Robot API | Engine-agnostic, consistent across physics engines | Engine-specific APIs; may require adaptation |
+| Coordinate Plane Mode | Full XY grid, axes, real-time pose visualization | Usually available, but often requires setup and configuration |
+| Installation | Browser-native, zero-install, cross-platform | Local installation, OS-dependent, may require GPU/driver setup |
+| Extensibility | Community-driven: add engines, sensors, robot models, fields | Often limited to plugin system or source modifications |
+| Target Users | Students, educators, competitive teams, researchers | Researchers, engineers, professional developers |
+| Accessibility | Works on laptops, Chromebooks, partial tablet support | Desktop-only; often requires high-performance hardware |
+| Open Source | ✅ Fully open & community-driven | Partially open or proprietary |
+
+**Summary:** VRSTE bridges the gap between **classroom robotics and professional simulation environments**, offering a modern, extensible platform that’s accessible, yet powerful enough for research and competitive robotics.
+
+
 ## Extensibility
 
 VRSTE is designed from the ground up to be **community-extendable**:
