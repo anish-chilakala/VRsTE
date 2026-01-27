@@ -153,6 +153,24 @@ VRSTE is designed to feel like a **full robotics lab in your browser**, combinin
 
 **Summary:** VRSTE bridges the gap between **classroom robotics and professional simulation environments**, offering a modern, extensible platform that’s accessible, yet powerful enough for research and competitive robotics.
 
+## Who VRSTE Is For
+
+VRSTE is designed to be **for everyone** — from hobbyists experimenting at home to competitive teams, researchers, and even top-tier professional robotics labs. It combines the accessibility of educational tools with the precision and extensibility needed for advanced robotics work.  
+
+| Feature / User Level | Hobbyists / Students | Competitive Teams / Educators | Researchers / Professional Labs | Top-Security / Advanced Robotics |
+|---------------------|-------------------|-------------------------------|--------------------------------|--------------------------------|
+| Programming | Real C++ in-browser | Real C++ & advanced algorithms | C++/Python prototyping, engine-agnostic | High-fidelity simulation, custom physics integration |
+| Editor | Monaco editor, simple UI | Live code transpilation, debugging | Full API access, async runtime | Extendable environment for custom robots and sensors |
+| Physics Engine | Built-in Simulation.js | MuJoCo, Bullet (planned) | Swappable engines, high-accuracy physics | Custom engines, multi-robot simulation, research-grade models |
+| Coordinate Plane Mode | Optional, visual guidance | Path planning, motion profiling | Real-time pose, autonomous routines | Full control for algorithm testing & sensor validation |
+| Accessibility | Browser-native, zero install | Cross-platform, Chromebooks supported | High-performance optional | Can integrate with secure/proprietary networks |
+| Extensibility | Add sensors, simple robots | Custom robot models, fields | New physics engines, advanced sensors | Full plugin & API access for complex robotics systems |
+| Target Users | Beginners, hobbyists | Students, educators, competition teams | Researchers, professional engineers | Labs, defense or proprietary robotics teams |
+
+**Summary:**  
+VRSTE is a **universal robotics platform**, scaling from beginner-friendly simulations to professional-grade robotics testing. It gives **hobbyists a playground**, **students and teams a learning lab**, and **researchers and advanced developers the tools they need to prototype, test, and extend complex robotic systems** — all in the browser.
+
+
 
 ## Extensibility
 
@@ -180,5 +198,11 @@ VRSTE aims to become the **standard open-source robotics simulator** for:
 - Professionals testing control systems  
 
 By combining **accessibility, performance, and extensibility**, VRSTE bridges the gap between educational tools and professional robotics platforms.
+
+## Timeline & Roadmap
+
+VRSTE is under active development, with the **first official version scheduled for release next month**. The project roadmap highlights key milestones and planned features:
+
+
 
 
