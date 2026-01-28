@@ -1,204 +1,374 @@
-# VRSTE CAD Analyzer - Standalone Version
+# VRSTE CAD Analyzer Backend API
 
-**100% Free - No API Required!**
+AI-powered fault and vulnerability detection system for CAD models in Virtual Robotics Simulation and Testing Environment (VRSTE).
 
-Rule-based geometric analysis backend for CAD models. Uses mathematical algorithms and engineering heuristics instead of AI.
+## Features
 
-## Key Benefits
-
-✅ **Completely Free** - No API costs, no subscriptions  
-✅ **No External Dependencies** - Runs entirely locally  
-✅ **Fast Analysis** - Instant results without API calls  
-✅ **Privacy** - Your CAD files never leave your server  
-✅ **Reliable** - Deterministic, reproducible results  
-
-## Currently Supported Formats
-
-- **STL** (Binary & ASCII) - Full geometric analysis ✨ **Best Support**
-- **OBJ** - Basic analysis
-- STEP, IGES, SAT - Not yet supported (convert to STL first, or use AI version)
-
-## What It Detects
-
-### STL Analysis (Comprehensive)
-- ✅ **Non-manifold geometry** - Invalid edges shared by wrong number of faces
-- ✅ **Degenerate triangles** - Extremely small or zero-area faces
-- ✅ **Poor triangle quality** - High aspect ratios that cause meshing issues
-- ✅ **Invalid normals** - Incorrect surface orientations
-- ✅ **Thin walls** - Potentially weak structural sections
-- ✅ **Scale issues** - Incorrect units or extreme dimensions
-- ✅ **Model statistics** - Volume, triangle count, bounding box
-
-### OBJ Analysis (Basic)
-- ✅ Vertex and face counting
-- ✅ Basic geometry validation
+- **Comprehensive Analysis**: Detects structural, geometric, assembly, manufacturing, material, and simulation issues
+- **Severity Classification**: Critical, High, Medium, and Low priority issues
+- **Detailed Solutions**: Step-by-step fix instructions for each issue
+- **Batch Processing**: Analyze multiple CAD files simultaneously
+- **Multiple File Formats**: Supports STEP, STL, OBJ, IGES, SAT, and more
+- **RESTful API**: Easy integration with any frontend
 
 ## Quick Start
 
+### Prerequisites
+
+- Python 3.8 or higher
+- Anthropic API key (get one at https://console.anthropic.com/)
+
 ### Installation
 
-```bash
-# Install dependencies (only Flask!)
-pip install -r requirements_standalone.txt
+1. **Clone or download the backend files**
 
-# Run the server
-python vrste_backend_standalone.py
+2. **Install dependencies**
+```bash
+pip install -r requirements.txt
 ```
 
-That's it! No API keys, no configuration needed.
+3. **Set up environment variables**
+```bash
+# Copy the template
+cp .env.template .env
 
-### Server Info
-- Default URL: `http://localhost:5000`
-- Health check: `GET /health`
-- Analysis: `POST /api/analyze`
+# Edit .env and add your Anthropic API key
+export ANTHROPIC_API_KEY='your-api-key-here'
+```
 
-## API Usage
+4. **Run the server**
+```bash
+# Development mode
+python vrste_backend_production.py
 
-### Analyze STL File
+# Production mode with Gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 vrste_backend_production:app
+```
 
-```javascript
-// Frontend integration example
-async function analyzeSTL(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  const response = await fetch('http://localhost:5000/api/analyze', {
-    method: 'POST',
-    body: formData
-  });
-  
-  const result = await response.json();
-  console.log(`Found ${result.summary.total_issues} issues`);
-  console.log(`Health Score: ${result.model_health_score}/100`);
-  
-  return result;
+The API will be available at `http://localhost:5000`
+
+## API Endpoints
+
+### Health Check
+```
+GET /health
+```
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "service": "VRSTE CAD Analyzer",
+  "version": "1.0.0",
+  "api_configured": true,
+  "timestamp": "2026-01-28T10:30:00Z"
 }
 ```
 
-### Example Response
+### Analyze Single CAD Model
 
+```
+POST /api/analyze
+Content-Type: application/json
+```
+
+**Request Body (JSON):**
+```json
+{
+  "file": "base64_encoded_file_data",
+  "file_type": "STEP",
+  "file_name": "robot_arm.step",
+  "analysis_options": {
+    "focus_areas": ["structural", "geometric", "assembly"],
+    "severity_threshold": "medium",
+    "include_recommendations": true,
+    "detailed_solutions": true
+  }
+}
+```
+
+**Request Body (Multipart Form):**
+```
+file: <binary file>
+file_type: STEP
+analysis_options: {"focus_areas": ["all"]}
+```
+
+**Response:**
 ```json
 {
   "status": "success",
-  "file_name": "robot_arm.stl",
-  "model_stats": {
-    "triangle_count": 5234,
-    "vertex_count": 15702,
-    "volume": 1234.56,
-    "bounding_box": {
-      "min": [0, 0, 0],
-      "max": [100, 50, 75],
-      "size": [100, 50, 75]
-    }
-  },
+  "timestamp": "2026-01-28T10:30:00Z",
+  "file_type": "STEP",
+  "file_name": "robot_arm.step",
   "summary": {
-    "total_issues": 3,
-    "critical": 1,
-    "high": 1,
-    "medium": 1,
-    "low": 0
+    "total_issues": 8,
+    "critical": 2,
+    "high": 3,
+    "medium": 2,
+    "low": 1
   },
   "issues": [
     {
       "id": "ISS-001",
       "severity": "critical",
-      "category": "geometric",
-      "title": "Non-manifold geometry detected",
-      "description": "Found 23 non-manifold edges...",
+      "category": "structural",
+      "title": "Insufficient wall thickness",
+      "description": "Wall thickness of 0.8mm is below recommended 2.0mm",
+      "location": "mounting_bracket.step, Face IDs: 24-28",
+      "impact": "High risk of structural failure",
       "solution": {
         "steps": [
-          "Import model into CAD software",
-          "Use 'Repair' or 'Make Manifold' tool",
-          "..."
+          "Select the mounting bracket",
+          "Increase wall thickness to 2.5mm",
+          "Verify no interference with adjacent parts"
         ],
-        "estimated_time": "15-45 minutes",
-        "difficulty": "medium"
-      }
+        "estimated_time": "15-20 minutes",
+        "difficulty": "easy"
+      },
+      "priority": 1
     }
   ],
-  "model_health_score": 75,
-  "estimated_fix_time": "1.5 hours"
+  "recommendations": {
+    "immediate_actions": ["Fix critical issues before manufacturing"],
+    "short_term": ["Address high-priority items"],
+    "long_term": ["Optimize for weight reduction"],
+    "best_practices": ["Implement design review checklist"]
+  },
+  "estimated_fix_time": "3-4 hours",
+  "model_health_score": 62,
+  "confidence_level": "high"
 }
 ```
 
-## How It Works
+### Batch Analysis
 
-### STL Analysis Pipeline
+```
+POST /api/analyze/batch
+Content-Type: application/json
+```
 
-1. **File Parsing** - Detects and parses binary or ASCII STL format
-2. **Topology Analysis** - Checks edge connectivity for manifold errors
-3. **Quality Metrics** - Evaluates triangle shape, size, and distribution
-4. **Geometric Validation** - Verifies normals, detects degenerates
-5. **Structural Analysis** - Identifies thin walls and weak points
-6. **Issue Classification** - Assigns severity and priority to each problem
-7. **Solution Generation** - Provides step-by-step fix instructions
+**Request Body:**
+```json
+{
+  "files": [
+    {
+      "file": "base64_encoded_data_1",
+      "file_name": "part1.step",
+      "file_type": "STEP"
+    },
+    {
+      "file": "base64_encoded_data_2",
+      "file_name": "part2.stl",
+      "file_type": "STL"
+    }
+  ],
+  "analysis_options": {
+    "focus_areas": ["all"],
+    "severity_threshold": "low"
+  }
+}
+```
 
-### Algorithms Used
+### Get Configuration
 
-- **Manifold Detection**: Edge-face connectivity graph analysis
-- **Triangle Quality**: Aspect ratio and edge length calculations
-- **Thin Wall Detection**: Proximity analysis of parallel surfaces
-- **Volume Calculation**: Divergence theorem on triangulated surface
-- **Normal Validation**: Vector magnitude and consistency checks
+```
+GET /api/config
+```
 
-## Comparison: Standalone vs AI Version
+## Integration Guide
 
-| Feature | Standalone | AI Version |
-|---------|-----------|-----------|
-| **Cost** | Free ✅ | Paid API |
-| **Speed** | Instant | 2-10 seconds |
-| **STL Analysis** | Comprehensive ✅ | Comprehensive ✅ |
-| **STEP/IGES** | ❌ Not supported | ✅ Supported |
-| **Issue Detection** | Rule-based | AI-powered |
-| **Explanations** | Template-based | Natural language |
-| **Setup** | 1 command | API key needed |
-| **Privacy** | 100% local ✅ | Files sent to API |
+### Frontend Integration Example
 
-## When to Use Each Version
+```javascript
+// Example: Analyze a CAD file
+async function analyzeCADModel(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('file_type', 'STEP');
+  formData.append('analysis_options', JSON.stringify({
+    focus_areas: ['structural', 'geometric'],
+    severity_threshold: 'medium'
+  }));
 
-### Use Standalone If:
-- Working with STL files
-- Want instant, free analysis
-- Need 100% privacy/offline capability
-- Don't need natural language explanations
-- Want deterministic, reproducible results
+  const response = await fetch('http://localhost:5000/api/analyze', {
+    method: 'POST',
+    body: formData
+  });
 
-### Use AI Version If:
-- Need STEP, IGES, or other CAD formats
-- Want sophisticated contextual analysis
-- Need natural language explanations
-- Budget allows API costs
-- Want state-of-the-art AI insights
+  const result = await response.json();
+  return result;
+}
 
-## Converting Other Formats to STL
+// Example: Using base64 encoded data
+async function analyzeBase64CAD(base64Data, fileName) {
+  const response = await fetch('http://localhost:5000/api/analyze', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      file: base64Data,
+      file_type: 'STEP',
+      file_name: fileName,
+      analysis_options: {
+        focus_areas: ['all'],
+        severity_threshold: 'low',
+        include_recommendations: true
+      }
+    })
+  });
 
-Most CAD software can export to STL:
+  return await response.json();
+}
+```
 
-**SolidWorks**: File → Save As → STL  
-**Fusion 360**: File → Export → STL  
-**Blender**: File → Export → STL  
-**FreeCAD**: File → Export → Mesh Formats → STL  
-**Onshape**: Right-click part → Export → STL  
+### React Integration Example
 
-**Tip**: Use binary STL format for better performance and smaller file size.
+```jsx
+import React, { useState } from 'react';
+
+function CADAnalyzer() {
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('file_type', file.name.split('.').pop().toUpperCase());
+
+    try {
+      const response = await fetch('http://localhost:5000/api/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      setAnalysis(result);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleFileUpload} accept=".step,.stl,.obj" />
+      
+      {loading && <p>Analyzing...</p>}
+      
+      {analysis && (
+        <div>
+          <h2>Analysis Results</h2>
+          <p>Issues Found: {analysis.summary?.total_issues}</p>
+          <ul>
+            {analysis.issues?.map((issue) => (
+              <li key={issue.id}>
+                <strong>{issue.title}</strong> - {issue.severity}
+                <p>{issue.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Python Integration Example
+
+```python
+import requests
+import base64
+
+def analyze_cad_file(file_path):
+    """Analyze a CAD file"""
+    
+    # Read and encode file
+    with open(file_path, 'rb') as f:
+        file_data = base64.b64encode(f.read()).decode('utf-8')
+    
+    # Prepare request
+    payload = {
+        'file': file_data,
+        'file_type': 'STEP',
+        'file_name': file_path.split('/')[-1],
+        'analysis_options': {
+            'focus_areas': ['all'],
+            'severity_threshold': 'medium'
+        }
+    }
+    
+    # Make request
+    response = requests.post(
+        'http://localhost:5000/api/analyze',
+        json=payload
+    )
+    
+    return response.json()
+
+# Usage
+result = analyze_cad_file('robot_arm.step')
+print(f"Found {result['summary']['total_issues']} issues")
+```
+
+## Analysis Options
+
+### Focus Areas
+- `structural`: Wall thickness, reinforcement, stress concentrations
+- `geometric`: Manifold edges, surface quality, intersections
+- `assembly`: Clearances, interferences, mounting points
+- `manufacturing`: Printability, machinability, tolerances
+- `material`: Material selection, safety factors, performance
+- `simulation`: Mesh quality, boundary conditions, units
+- `all`: All categories (default)
+
+### Severity Thresholds
+- `low`: Show all issues
+- `medium`: Show medium and above
+- `high`: Show high and critical only
+- `critical`: Show only critical issues
+
+## Supported File Formats
+
+- **STEP** (.step, .stp) - Recommended for best analysis
+- **STL** (.stl) - Good for geometric analysis
+- **OBJ** (.obj) - Basic geometric analysis
+- **IGES** (.iges, .igs) - Legacy CAD format
+- **SAT** (.sat) - ACIS solid modeling
 
 ## Configuration
 
-Environment variables (optional):
+Environment variables can be set in `.env` file:
 
 ```bash
-export MAX_FILE_SIZE_MB=50
-export ALLOWED_FILE_TYPES=STL,OBJ
-export PORT=5000
-export HOST=0.0.0.0
+# Required
+ANTHROPIC_API_KEY=your_api_key_here
+
+# Optional
+FLASK_ENV=production
+FLASK_DEBUG=False
+HOST=0.0.0.0
+PORT=5000
+MAX_FILE_SIZE_MB=50
+ALLOWED_FILE_TYPES=STEP,STL,OBJ,IGES,SAT
+CLAUDE_MODEL=claude-sonnet-4-20250514
+MAX_TOKENS=4000
 ```
 
 ## Production Deployment
 
-### Using Gunicorn
+### Using Gunicorn (Recommended)
 
 ```bash
-gunicorn -w 4 -b 0.0.0.0:5000 vrste_backend_standalone:app
+gunicorn -w 4 -b 0.0.0.0:5000 vrste_backend_production:app
 ```
 
 ### Using Docker
@@ -207,132 +377,98 @@ gunicorn -w 4 -b 0.0.0.0:5000 vrste_backend_standalone:app
 FROM python:3.12-slim
 
 WORKDIR /app
-COPY requirements_standalone.txt .
-RUN pip install -r requirements_standalone.txt
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-COPY vrste_backend_standalone.py .
+COPY vrste_backend_production.py .
+COPY .env .
 
 EXPOSE 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "vrste_backend_standalone:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "vrste_backend_production:app"]
 ```
 
-Build and run:
-```bash
-docker build -t vrste-standalone .
-docker run -p 5000:5000 vrste-standalone
+### Using systemd
+
+Create `/etc/systemd/system/vrste-analyzer.service`:
+
+```ini
+[Unit]
+Description=VRSTE CAD Analyzer API
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/opt/vrste-analyzer
+Environment="ANTHROPIC_API_KEY=your-key-here"
+ExecStart=/usr/bin/gunicorn -w 4 -b 0.0.0.0:5000 vrste_backend_production:app
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-## Limitations
+## Error Handling
 
-### Current Limitations
-- STEP, IGES, SAT formats not yet supported (convert to STL first)
-- Assembly analysis limited (analyze individual parts)
-- Material properties not analyzed (geometric only)
-- FEA-level stress analysis not included
+The API returns consistent error responses:
 
-### Planned Features
-- PLY format support
-- Advanced mesh quality metrics
-- Automated repair suggestions
-- Export repair scripts
-- 3D visualization endpoint
-
-## Performance
-
-- **Small models** (<10K triangles): <100ms
-- **Medium models** (10K-100K triangles): 100-500ms
-- **Large models** (>100K triangles): 500ms-2s
-
-Memory usage: ~50MB base + ~1MB per 10K triangles
-
-## Troubleshooting
-
-**"Could not parse STL file"**
-- Verify file is valid STL format
-- Check file isn't corrupted
-- Try exporting again from CAD software
-
-**"No triangles found"**
-- File may be ASCII STL with incorrect format
-- Try exporting as binary STL instead
-
-**Analysis too slow**
-- Reduce triangle count (simplify mesh)
-- Use binary STL instead of ASCII
-- Increase server resources
-
-## Integration Examples
-
-### Python Client
-
-```python
-import requests
-
-def analyze_stl_file(filepath):
-    with open(filepath, 'rb') as f:
-        files = {'file': f}
-        response = requests.post(
-            'http://localhost:5000/api/analyze',
-            files=files
-        )
-    return response.json()
-
-result = analyze_stl_file('model.stl')
-print(f"Health Score: {result['model_health_score']}/100")
-```
-
-### React Component
-
-```jsx
-function STLAnalyzer() {
-  const [result, setResult] = useState(null);
-  
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const res = await fetch('http://localhost:5000/api/analyze', {
-      method: 'POST',
-      body: formData
-    });
-    
-    setResult(await res.json());
-  };
-  
-  return (
-    <div>
-      <input type="file" accept=".stl" onChange={handleUpload} />
-      {result && (
-        <div>
-          <h3>Health Score: {result.model_health_score}/100</h3>
-          <p>Issues: {result.summary.total_issues}</p>
-        </div>
-      )}
-    </div>
-  );
+```json
+{
+  "status": "error",
+  "message": "Description of what went wrong",
+  "timestamp": "2026-01-28T10:30:00Z"
 }
 ```
 
+Common HTTP status codes:
+- `200`: Success
+- `400`: Bad request (invalid input)
+- `500`: Server error
+
+## Performance Tips
+
+1. **File Size**: Keep CAD files under 50MB for best performance
+2. **Batch Processing**: Use batch endpoint for multiple files
+3. **Focus Areas**: Specify only needed analysis areas
+4. **Caching**: Implement caching in your frontend for repeated analyses
+5. **Workers**: Increase Gunicorn workers for concurrent requests
+
+## Security Considerations
+
+1. **API Key**: Never expose your Anthropic API key in frontend code
+2. **File Validation**: Backend validates file types and sizes
+3. **CORS**: Configure CORS settings for production
+4. **Rate Limiting**: Consider implementing rate limiting
+5. **HTTPS**: Use HTTPS in production
+
+## Troubleshooting
+
+### "API key not configured"
+- Ensure `ANTHROPIC_API_KEY` is set in environment variables
+- Check `.env` file exists and is loaded
+
+### "File too large"
+- Reduce file size or increase `MAX_FILE_SIZE_MB` setting
+- Consider splitting large assemblies
+
+### "Analysis timeout"
+- Increase `MAX_TOKENS` setting
+- Simplify complex models
+- Use focus areas to reduce analysis scope
+
 ## License
 
-MIT License - Use freely in commercial and personal projects
+See LICENSE file for details.
 
 ## Support
 
 For issues or questions:
-- Check troubleshooting section
+- Check the troubleshooting section
 - Review API documentation
-- Submit issues on GitHub
+- Contact support team
 
-## Contributing
+## Version History
 
-Contributions welcome! Especially:
-- Additional file format support (STEP, IGES)
-- More geometric analysis algorithms
-- Performance optimizations
-- Bug fixes and improvements
-
----
-
-**Ready to analyze?** Run `python vrste_backend_standalone.py` and start detecting CAD issues instantly!
+- **1.0.0** (2026-01-28): Initial release
+  - Single file analysis
+  - Batch processing
+  - Support for major CAD formats
+  - Comprehensive issue detection
