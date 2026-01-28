@@ -1,0 +1,7 @@
+STEP/IGES files needed? → Claude API (only option)
+$0 budget forever? → Professional (best free)
+Standards compliance? → Professional (ASME, ISO, ASTM)
+Novel problems? → Claude API (creative reasoning)
+Field failure data? → Professional (10,000+ cases)
+Natural explanations? → Claude API (conversational)
+Offline/air-gapped? → Professional (100% local)
